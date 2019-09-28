@@ -28,4 +28,14 @@
         android:layout_height="wrap_content"
         android:text="start handler thread"
         android:id="@+id/handler_thread"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="schedule a job"
+        android:id="@+id/schedule_job"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cancel a job"
+        android:id="@+id/cancel_job"/>
 </LinearLayout>

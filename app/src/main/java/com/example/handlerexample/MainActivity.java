@@ -1,8 +1,13 @@
 package com.example.handlerexample;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -13,7 +18,7 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    Button firstThreadBtn, secondRunnableBtn,mainThreadBtn,handlerThread;
+    Button firstThreadBtn, secondRunnableBtn,mainThreadBtn,handlerThread,scheduleJobBtn,cancelJobBtn;
     FirstThread firstThread;
     Thread thread;
     MyHandlerThread myHandlerThread;
@@ -29,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         firstThreadBtn = findViewById(R.id.first_thread);
         secondRunnableBtn = findViewById(R.id.second_runnable);
         handlerThread = findViewById(R.id.handler_thread);
+        scheduleJobBtn = findViewById(R.id.schedule_job);
+        cancelJobBtn = findViewById(R.id.cancel_job);
 
         //get handler of ui thread
         mainHandler = new Handler();
@@ -84,6 +91,47 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        scheduleJobBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scheduleJob(v);
+            }
+        });
+
+       cancelJobBtn.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               cancelJob(v);
+           }
+       });
+    }
+
+    /*
+    schedule a job
+     */
+
+    public void scheduleJob(View v){
+        ComponentName componentName = new ComponentName(this, MyJobService.class);
+        JobInfo info = new JobInfo.Builder(100,componentName)
+                .setRequiresCharging(true)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setPersisted(true)
+                .setPeriodic(10*60*1000)
+                .build();
+        JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        int resultCode = scheduler.schedule(info);
+        if(resultCode == JobScheduler.RESULT_SUCCESS){
+            Log.d(TAG, "scheduled Job: ");
+        }else{
+            Log.d(TAG, "failed Job schedule: ");
+        }
+    }
+
+    public void cancelJob(View v){
+        JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        scheduler.cancel(100);
+        Log.d(TAG, "cancelJob: ");
     }
 
     private class FirstThread extends Thread{
